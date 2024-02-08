@@ -1,0 +1,18 @@
+/* App.css */
+body {
+  font-family: Arial, sans-serif;
+}
+
+form {
+  margin-bottom: 1rem;
+}
+
+input[type="text"] {
+  padding: 0.5rem;
+  margin-right: 1rem;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
