@@ -1,4 +1,5 @@
 // ProductoForm.jsx
+
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 
@@ -12,25 +13,50 @@ const ProductoForm = ({ supabase }) => {
     e.preventDefault();
     if (!nombre.trim()) return;
     try {
-      const { error } = await supabase.from('producto').insert([{
+      // Obtén el número de filas en la tabla 'producto'
+      const { count: numProductos, error: countError } = await supabase.from('producto').select('*', { count: 'exact' });
+  
+      if (countError) {
+        throw countError;
+      }
+  
+      // El próximo idproducto será numProductos + 1
+      const idproducto = numProductos + 1;
+  
+      const { error: productoError } = await supabase.from('producto').insert([{
+        idproducto,
         nombre,
         categoria,
         stock,
-        precio // Agrega el precio al objeto insertado
-      }]);
-      if (error) {
-        throw error;
+        precio 
+      }], { returning: 'representation' }); // Cambiado a 'representation'
+  
+      if (productoError) {
+        throw productoError;
       }
+  
+      const { error: transaccionError } = await supabase.from('transaccion').insert([{
+        accion: 'Agregar',
+        producto: idproducto, 
+        cantidad: stock
+      }]);
+  
+      if (transaccionError) {
+        throw transaccionError;
+      }
+  
       setNombre('');
       setCategoria('');
       setStock('');
-      setPrecio(''); // Limpia el estado del precio
+      setPrecio(''); 
       alert('Producto agregado correctamente');
     } catch (error) {
       console.error('Error adding producto:', error.message);
       alert('No se agregó el producto correctamente');
     }
   };
+  
+  
 
   return (
     <form onSubmit={handleSubmit}>
@@ -63,7 +89,7 @@ const ProductoForm = ({ supabase }) => {
         onChange={(e) => setStock(e.target.value)}
       />
       <br />
-      Precio: {/* Nuevo campo de entrada para el precio */}
+      Precio: 
       <br />
       <input
         type="number"

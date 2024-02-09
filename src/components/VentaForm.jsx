@@ -8,7 +8,7 @@ const VentaForm = ({ supabase }) => {
   const [cantidad, setCantidad] = useState('');
 
   useEffect(() => {
-    fetchProductos(); // Llama a fetchProductos cuando el componente se monta
+    fetchProductos(); 
   }, [supabase]);
 
   async function fetchProductos() {
@@ -26,11 +26,10 @@ const VentaForm = ({ supabase }) => {
       console.error('Error fetching productos:', error.message);
     }
   }
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!producto.trim()) return;
-
+  
     // Buscar el producto para obtener el stock actual
     let { data: productos, error } = await supabase
       .from('producto')
@@ -40,13 +39,13 @@ const VentaForm = ({ supabase }) => {
       throw error;
     }
     const stockActual = productos[0].stock;
-
+  
     // Validar que la cantidad de venta no sea mayor que el stock disponible
     if (cantidad > stockActual) {
       alert('No se puede vender más productos de los que hay en stock');
       return;
     }
-
+  
     try {
       const { error } = await supabase.from('venta').insert([{
         producto,
@@ -55,23 +54,34 @@ const VentaForm = ({ supabase }) => {
       if (error) {
         throw error;
       }
-
+  
       // Actualizar el stock del producto
       await supabase
         .from('producto')
         .update({ stock: stockActual - cantidad })
         .eq('idproducto', producto);
-
+  
+      // Agregar la transacción
+      const { error: transaccionError } = await supabase.from('transaccion').insert([{
+        accion: 'Venta',
+        producto,
+        cantidad
+      }]);
+      if (transaccionError) {
+        throw transaccionError;
+      }
+  
       alert('Venta agregada correctamente');
       setProducto('');
       setCantidad('');
-
+  
       fetchProductos(); // Vuelve a buscar los productos después de que se haya realizado una venta
     } catch (error) {
       console.error('Error adding venta:', error.message);
       alert('No se agregó la venta correctamente');
     }
   };
+  
 
   return (
     <form onSubmit={handleSubmit}>
