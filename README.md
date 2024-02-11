@@ -1,42 +1,93 @@
-# Task Manager
+# Examen 2do Parcial
 
-Este proyecto es una aplicación de gestión de tareas construida con React y Supabase.
+Este proyecto es una aplicación de gestión para una bodega
 
 ## Tecnologías utilizadas
 
 - React.js
 - Supabase
 
-## Cómo contribuir
-
-1. Haz un "Fork" del repositorio.
-2. Clona tu fork en tu máquina local (`git clone https://github.com/statick88/task`).
-3. Crea una nueva rama para tus cambios (`git checkout -b nombre-de-tu-rama`).
-4. Realiza tus cambios y haz un commit (`git commit -m "Descripción de los cambios"`).
-5. Haz un push a tu rama (`git push origin nombre-de-tu-rama`).
-6. Crea un "Pull Request" desde tu rama en GitHub.
-
 ## Configuración de Supabase
 
-1. Crea una cuenta en [Supabase](https://supabase.io/).
+1. Crea una cuenta en Supabase.
 2. Crea un nuevo proyecto.
-3. En la sección "Database", crea una nueva tabla para las tareas. Puedes usar el siguiente código SQL:
-```sql
-CREATE TABLE task (
-  id SERIAL PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  description TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+3. En la Configuracion del proyecto seccion "tus apps" obtener las variables `URL` y `KEY` con los valores proporcionados por Supabase.
+5. Implementar las siguientes tablas
+
+```
+   create table
+  public.producto (
+    idproducto serial,
+    nombre character varying(125) not null,
+    categoria character varying(125) not null,
+    created_at timestamp with time zone null default current_timestamp,
+    updated_at timestamp with time zone null default current_timestamp,
+    stock integer null,
+    precio double precision null,
+    constraint producto_pkey primary key (idproducto)
+  ) tablespace pg_default;
+
+create trigger update_modtime before
+update on producto for each row
+execute function update_modified_column ();
+```
+
+```
+    create table
+  public.transaccion (
+    idtransaccion serial,
+    accion character varying(125) not null,
+    producto character varying(125) not null,
+    created_at timestamp with time zone null default current_timestamp,
+    updated_at timestamp with time zone null default current_timestamp,
+    cantidad integer null,
+    categoria character varying(125) null,
+    constraint transaccion_pkey primary key (idtransaccion)
+  ) tablespace pg_default;
+
+create trigger update_modtime before
+update on transaccion for each row
+execute function update_modified_column ();
+```
+
+```
+    create table
+  public.venta (
+    idventa serial,
+    producto integer not null,
+    created_at timestamp with time zone null default current_timestamp,
+    updated_at timestamp with time zone null default current_timestamp,
+    cantidad integer null,
+    constraint venta_pkey primary key (idventa),
+    constraint venta_producto_fkey foreign key (producto) references producto (idproducto)
+  ) tablespace pg_default;
+
+create trigger update_modtime before
+update on venta for each row
+execute function update_modified_column ();
+```	  
+
+## Como correr el programa
+
+1. Crear el archivo .env a la altura de la raiz del proyecto con el siguiente formato y colocar sus variables
+```
+      VITE_REACT_APP_SUPABASE_URL=
+      VITE_REACT_APP_SUPABASE_ANON_KEY=
 ```	
-4. Configura las variables de entorno `VITE_REACT_APP_SUPABASE_URL` y `VITE_REACT_APP_SUPABASE_ANON_KEY` con los valores proporcionados por Supabase.
+      
+2. Ingresar a la terminal del proyecto y correr el siguiente codigo para actualizar lo paquetes
+```
+    npm i
+```
 
-## Mejoras futuras
+3. En la misma terminal correr el siguiente codigo para inciar el proyecto
+```
+    npm run dev
+```
 
-- ❌ Autenticación de usuarios.
-- ❌ Asignación de tareas a usuarios.
-- ❌ Actualización de tareas: permitir a los usuarios modificar las tareas existentes.
-- ❌ Notificaciones por correo electrónico cuando se asigna una tarea.
-- ❌ Filtros para la lista de tareas.
-- ❌ Ruta de tareas completadas: mostrar en una ruta separada las tareas que ya se han realizado.
+
+## Autores
+
+Carol Jacome - Steven Oviedo 
+
+DIEGO MEDARDO SAAVEDRA GARCIA "statick88" (Codigo Original)
