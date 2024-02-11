@@ -1,5 +1,3 @@
-// ProductoForm.jsx
-
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 
@@ -13,18 +11,7 @@ const ProductoForm = ({ supabase }) => {
     e.preventDefault();
     if (!nombre.trim()) return;
     try {
-      // Obtén el número de filas en la tabla 'producto'
-      const { count: numProductos, error: countError } = await supabase.from('producto').select('*', { count: 'exact' });
-  
-      if (countError) {
-        throw countError;
-      }
-  
-      // El próximo idproducto será numProductos + 1
-      const idproducto = numProductos + 1;
-  
       const { error: productoError } = await supabase.from('producto').insert([{
-        idproducto,
         nombre,
         categoria,
         stock,
@@ -37,7 +24,8 @@ const ProductoForm = ({ supabase }) => {
   
       const { error: transaccionError } = await supabase.from('transaccion').insert([{
         accion: 'Agregar',
-        producto: idproducto, 
+        producto: nombre, 
+        categoria: categoria,
         cantidad: stock
       }]);
   

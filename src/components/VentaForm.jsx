@@ -1,4 +1,3 @@
-// VentaForm.jsx
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
@@ -15,7 +14,7 @@ const VentaForm = ({ supabase }) => {
     try {
       let { data: productos, error } = await supabase
         .from('producto')
-        .select('idproducto, nombre, stock, precio');
+        .select('idproducto, nombre, stock, precio, categoria');
   
       if (error) {
         throw error;
@@ -33,12 +32,14 @@ const VentaForm = ({ supabase }) => {
     // Buscar el producto para obtener el stock actual
     let { data: productos, error } = await supabase
       .from('producto')
-      .select('stock')
+      .select('stock, nombre, categoria')
       .eq('idproducto', producto);
     if (error) {
       throw error;
     }
     const stockActual = productos[0].stock;
+    const nombreProducto = productos[0].nombre;
+    const categoriaProducto = productos[0].categoria;
   
     // Validar que la cantidad de venta no sea mayor que el stock disponible
     if (cantidad > stockActual) {
@@ -64,7 +65,8 @@ const VentaForm = ({ supabase }) => {
       // Agregar la transacción
       const { error: transaccionError } = await supabase.from('transaccion').insert([{
         accion: 'Venta',
-        producto,
+        producto: nombreProducto,
+        categoria: categoriaProducto,
         cantidad
       }]);
       if (transaccionError) {

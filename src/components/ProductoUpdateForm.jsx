@@ -6,13 +6,13 @@ const ProductoUpdateForm = ({ producto, supabase, onProductoUpdated }) => {
     const [nombre, setNombre] = useState('');
     const [categoria, setCategoria] = useState('');
     const [stock, setStock] = useState('');
-    const [precio, setPrecio] = useState(''); // Nuevo estado para el precio
+    const [precio, setPrecio] = useState(''); 
   
     useEffect(() => {
       setNombre(producto.nombre);
       setCategoria(producto.categoria);
       setStock(producto.stock);
-      setPrecio(producto.precio); // Inicializa el estado del precio
+      setPrecio(producto.precio); 
     }, [producto]);
   
     const handleSubmit = async (e) => {
@@ -23,7 +23,7 @@ const ProductoUpdateForm = ({ producto, supabase, onProductoUpdated }) => {
           nombre,
           categoria,
           stock,
-          precio // Agrega el precio al objeto de actualización
+          precio 
         }).eq('idproducto', producto.idproducto);
         if (error) {
           throw error;
@@ -67,7 +67,7 @@ const ProductoUpdateForm = ({ producto, supabase, onProductoUpdated }) => {
         onChange={(e) => setStock(e.target.value)}
       />
       <br />
-      Precio: {/* Nuevo campo de entrada para el precio */}
+      Precio: 
       <br />
       <input
         type="number"
